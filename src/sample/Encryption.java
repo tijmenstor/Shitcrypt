@@ -15,7 +15,7 @@ public class Encryption {
      * @param valueN a given number
      * @return list of prime integers.
      */
-    public List<Integer> calculatePrimeNumbers(int valueN) {
+    public static List<Integer> calculatePrimeNumbers(int valueN) {
         List<Integer> factors = new ArrayList<>();
         for (int i = 2; i <= valueN / i; i++) {
             while (valueN % i == 0) {
@@ -35,7 +35,7 @@ public class Encryption {
      * @param valueN given number.
      * @return boolean to indicate if its a semiprime.
      */
-    public boolean isSemiPrime(int valueN) {
+    public static boolean isSemiPrime(int valueN) {
         int cnt = 0;
 
         for (int i = 2; cnt < 2 && i * i <= valueN; ++i) {
@@ -50,7 +50,7 @@ public class Encryption {
         return cnt == 2;
     }
 
-    public List<Integer> calculateCipher(String plainMessage, int pkCompositeFirst, int pkCompositeSecond, int pkSecond) {
+    public static List<Integer> calculateCipher(String plainMessage, int pkCompositeFirst, int pkCompositeSecond, int pkSecond) {
         List<Integer> cipherList = new ArrayList<>();
         for (int i = 0; i < plainMessage.length(); i++) {
             char currentBlock = plainMessage.toLowerCase().charAt(i);
@@ -72,7 +72,7 @@ public class Encryption {
      *
      * @return second part of the public key
      */
-    public int calculatePublicKeyPart2(int publicKeyPart) {
+    public static int calculatePublicKeyPart2(int publicKeyPart) {
         int newEValue;
         do {
             newEValue = new Random().nextInt(publicKeyPart - 2) + 1;
@@ -89,7 +89,7 @@ public class Encryption {
      * @param b second prime number
      * @return biggest common divider
      */
-    public static int euclidsMethod(int a, int b) {
+    private static int euclidsMethod(int a, int b) {
         int t;
         while (b != 0) {
             t = a;
@@ -106,7 +106,7 @@ public class Encryption {
      * @param b second prime number
      * @return if the biggest divider is 1, they are relatively prime == true
      */
-    public static boolean isRelativelyPrime(int a, int b) {
+    private static boolean isRelativelyPrime(int a, int b) {
         return euclidsMethod(a, b) == 1;
     }
 }
