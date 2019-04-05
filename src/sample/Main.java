@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -26,16 +27,19 @@ public class Main {
     private final JLabel eValueLabel;
     private final JLabel encryptedMsgLabel;
     private final JLabel decryptedValueLabel;
+    private final JLabel decryptedMessageLabel;
 
     private final JButton step1Button;
     private final JButton step2Button;
     private final JButton step3Button;
     private final JButton step1DecButton;
+    private final JButton step2DecButton;
 
     private final JTextField step1Field;
     private final JTextField step3Field;
     private final JTextField step1pbKeyN;
     private final JTextField step1pbkeyE;
+    private final JTextField step2EncryptedText;
 
 
     private Main() {
@@ -54,10 +58,10 @@ public class Main {
         frame.setPreferredSize(new Dimension(600, 400));
 
         inputLabel = new JLabel("Input value n:");
-        pqValueLabel = new JLabel("p = " + pValue + ", q = " + qValue);
-        pqTimeLabel = new JLabel("Time : " + time + " ms");
-        eValueLabel = new JLabel("e = ");
-        encryptedMsgLabel = new JLabel("Encrypted msg : " + encryptedMsg);
+        pqValueLabel = new JLabel("p is " + pValue + ", q is " + qValue);
+        pqTimeLabel = new JLabel("Amount of time busy finding p and q: " + time + " ms");
+        eValueLabel = new JLabel("e is ");
+        encryptedMsgLabel = new JLabel("Message after encryption is: " + encryptedMsg);
 
         step1Button = new JButton("Step 1");
         step2Button = new JButton("Step 2");
@@ -69,9 +73,13 @@ public class Main {
         step1pbkeyE = new JTextField();
         step1pbKeyN = new JTextField();
 
-        step1DecButton = new JButton("Step 1");
+        step2EncryptedText = new JTextField();
 
-        decryptedValueLabel = new JLabel("Decrypted value: ");
+        step1DecButton = new JButton("Step 1");
+        step2DecButton = new JButton("Step 2");
+
+        decryptedValueLabel = new JLabel("d is ");
+        decryptedMessageLabel = new JLabel("Message after decryption is: ");
 
         JComponent encryptionTab = createPanel();
         tabs.addTab("Encryption", null, encryptionTab, "Encryption");
@@ -103,13 +111,24 @@ public class Main {
 
         JComponent decryptionTab = createPanel();
         tabs.addTab("Decryption", null, decryptionTab, "Decryption");
+
+        //step 1
         JPanel step1Decryption = new JPanel(new MigLayout());
         step1Decryption.setBorder(new TitledBorder("Step 1"));
         step1Decryption.add(step1pbKeyN, "growx, wrap");
-        step1Decryption.add(step1pbkeyE, "growx");
+        step1Decryption.add(step1pbkeyE, "growx, wrap");
         step1Decryption.add(step1DecButton, "growx, wrap");
         step1Decryption.add(decryptedValueLabel, "growx");
         decryptionTab.add(step1Decryption);
+
+        //step 2
+        JPanel step2Decryption = new JPanel(new MigLayout());
+        step2Decryption.setBorder(new TitledBorder("Step 2"));
+        step2Decryption.add(step2EncryptedText, "growx, wrap");
+        step2Decryption.add(step2DecButton, "growx, wrap");
+        step2Decryption.add(decryptedMessageLabel, "growx");
+        decryptionTab.add(step2Decryption);
+
 
         frame.add(tabs, "wrap, grow");
 
@@ -117,6 +136,8 @@ public class Main {
         step2Button.addActionListener(this::step2Handler);
         step3Button.addActionListener(this::step3Handler);
         step1DecButton.addActionListener(this::step1DecHandler);
+        step2DecButton.addActionListener(this::step2DecHandler);
+
         display();
     }
 
@@ -137,8 +158,8 @@ public class Main {
             pValue = primeNumbers.get(0);
             qValue = primeNumbers.get(1);
             pqValue = (pValue - 1) * (qValue - 1);
-            pqValueLabel.setText("p = " + pValue + ", q = " + qValue);
-            pqTimeLabel.setText("Time : " + time + " ms");
+            pqValueLabel.setText("p is " + pValue + ", q is " + qValue);
+            pqTimeLabel.setText("Amount of time busy finding p and q: " + time + " ms");
             return;
         }
 
@@ -148,7 +169,7 @@ public class Main {
     private void step2Handler(ActionEvent event) {
         if (pqValue != 0) {
             eValue = Encryption.calculatePublicKeyPart2(pqValue);
-            eValueLabel.setText("e = " + eValue);
+            eValueLabel.setText("e is " + eValue);
             return;
         }
 
@@ -157,13 +178,22 @@ public class Main {
 
     private void step3Handler(ActionEvent event) {
         encryptedMsg = Encryption.calculateCipher(step3Field.getText(), pValue, qValue, eValue).toString();
-        encryptedMsgLabel.setText("Encrypted msg : " + encryptedMsg);
+        encryptedMsgLabel.setText("Message after encryption is: " + encryptedMsg);
     }
 
     private void step1DecHandler(ActionEvent event) {
         int n = Integer.parseInt(step1pbKeyN.getText());
         int e = Integer.parseInt(step1pbkeyE.getText());
-        decryptedValueLabel.setText("Decrypted value : " + Decryption.calculateDecriptionKey(n, e));
+        decryptedValueLabel.setText("d is " + Decryption.calculateDecriptionKey(n, e));
+    }
+
+    private void step2DecHandler(ActionEvent event) {
+        String[] encryptedList = step2EncryptedText.getText().split(",");
+        List<Integer> encryptedNums = new ArrayList<>();
+        for (String encryptedNum : encryptedList) {
+            encryptedNums.add(Integer.parseInt(encryptedNum));
+        }
+        decryptedMessageLabel.setText("Message after decryption is: " + Decryption.calculateDecryptedText(encryptedNums));
     }
 
     private JComponent createPanel() {
