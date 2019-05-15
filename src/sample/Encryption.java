@@ -1,5 +1,6 @@
 package sample;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,20 +51,27 @@ public class Encryption {
         return cnt == 2;
     }
 
-    public static List<Integer> calculateCipher(String plainMessage, int pkCompositeFirst, int pkCompositeSecond, int pkSecond) {
+    public static List<List<Integer>> calculateCipher(String plainMessage, int pkCompositeFirst, int pkCompositeSecond, int pkSecond) {
         List<Integer> cipherList = new ArrayList<>();
-        for (int i = 0; i < plainMessage.length(); i++) {
-            char currentBlock = plainMessage.toLowerCase().charAt(i);
-            cipherList.add(alphabet.indexOf(currentBlock) + 1);
+        String[] wordArray = plainMessage.split(" ");
+        List<List<Integer>> encryptedWordList = new ArrayList<>();
+        for (String word : wordArray) {
+            List<Integer> tempWordArray = new ArrayList<>();
+            for (int i = 0; i < word.length(); i++) {
+                char currentBlock = word.charAt(i);
+                tempWordArray.add((int) currentBlock);
+            }
+            encryptedWordList.add(tempWordArray);
         }
 
-        for (int i = 0; i < cipherList.size(); i++) {
-            BigInteger currentBlock = BigInteger.valueOf(cipherList.get(i)).pow(pkSecond);
-            Integer newBlock = currentBlock.mod(BigInteger.valueOf(pkCompositeFirst * pkCompositeSecond)).intValue();
-            cipherList.set(i, newBlock);
-        }
-
-        return cipherList;
+        encryptedWordList.forEach(encryptedWord -> {
+            for (int i = 0; i < encryptedWord.size(); i++) {
+                BigInteger currentBlock = BigInteger.valueOf(encryptedWord.get(i)).pow(pkSecond);
+                Integer newBlock = currentBlock.mod(BigInteger.valueOf(pkCompositeFirst * pkCompositeSecond)).intValue();
+                encryptedWord.set(i, newBlock);
+            }
+        });
+        return encryptedWordList;
     }
 
     /**

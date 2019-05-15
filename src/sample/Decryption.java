@@ -26,17 +26,21 @@ public class Decryption {
         return inversedModuloNum.intValue();
     }
 
-    public static List<Character> calculateDecryptedText(List<Integer> encryptedText) {
-        List<Character> decryptedText = new ArrayList<>();
-        for (Integer encryptedChar : encryptedText) {
-            decryptedText.add(calculateCharacter(encryptedChar));
-        }
-        return decryptedText;
+    public static String calculateDecryptedText(List<List<Integer>> encryptedText) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        encryptedText.forEach(encryptedWord -> {
+            for (Integer integer : encryptedWord) {
+                stringBuilder.append(calculateCharacter(integer));
+            }
+            stringBuilder.append(" ");
+        });
+        return stringBuilder.toString();
     }
 
     private static Character calculateCharacter(int encryptedChar) {
         BigInteger currentChar = BigInteger.valueOf(encryptedChar).pow(pkDecrypt);
         currentChar = currentChar.mod(BigInteger.valueOf(publicPQKey));
-        return alphabet.charAt(currentChar.intValue() - 1);
+        return (char) currentChar.intValue();
     }
 }

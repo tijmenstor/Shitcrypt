@@ -34,6 +34,7 @@ public class Main {
     private final JButton step3Button;
     private final JButton step1DecButton;
     private final JButton step2DecButton;
+    private final JButton step2DecCopyButton;
 
     private final JTextField step1Field;
     private final JTextField step3Field;
@@ -77,6 +78,7 @@ public class Main {
 
         step1DecButton = new JButton("Step 1");
         step2DecButton = new JButton("Step 2");
+        step2DecCopyButton = new JButton("Copy Encrypted Message");
 
         decryptedValueLabel = new JLabel("d is ");
         decryptedMessageLabel = new JLabel("Message after decryption is: ");
@@ -106,7 +108,7 @@ public class Main {
         step3.setBorder(new TitledBorder("Step 3"));
         step3.add(step3Field, "growx");
         step3.add(step3Button, "wrap");
-        step3.add(encryptedMsgLabel, "growx");
+        step3.add(encryptedMsgLabel, "wrap");
         encryptionTab.add(step3, "grow");
 
         JComponent decryptionTab = createPanel();
@@ -126,6 +128,7 @@ public class Main {
         step2Decryption.setBorder(new TitledBorder("Step 2"));
         step2Decryption.add(step2EncryptedText, "growx, wrap");
         step2Decryption.add(step2DecButton, "growx, wrap");
+        step2Decryption.add(step2DecCopyButton, "growx, wrap");
         step2Decryption.add(decryptedMessageLabel, "growx");
         decryptionTab.add(step2Decryption);
 
@@ -137,6 +140,7 @@ public class Main {
         step3Button.addActionListener(this::step3Handler);
         step1DecButton.addActionListener(this::step1DecHandler);
         step2DecButton.addActionListener(this::step2DecHandler);
+        step2DecCopyButton.addActionListener(this::step3DecCopyHandler);
 
         display();
     }
@@ -188,12 +192,27 @@ public class Main {
     }
 
     private void step2DecHandler(ActionEvent event) {
-        String[] encryptedList = step2EncryptedText.getText().split(",");
-        List<Integer> encryptedNums = new ArrayList<>();
-        for (String encryptedNum : encryptedList) {
-            encryptedNums.add(Integer.parseInt(encryptedNum));
+        String[] encryptedList = step2EncryptedText.getText().substring(1, step2EncryptedText.getText().length() - 1)
+                .split(",(?<=]\\s?,)");
+        List<List<Integer>> encryptedNums = new ArrayList<>();
+        for (String encryptedString : encryptedList) {
+            List<Integer> tempList = new ArrayList<>();
+            String[] encryptedStringNums = encryptedString.replace("[", "").replace("]", "")
+                    .split(",");
+            for (String encryptedNumChar : encryptedStringNums) {
+                tempList.add(Integer.parseInt(encryptedNumChar.replaceAll("\\s+", "")));
+            }
+            encryptedNums.add(tempList);
         }
         decryptedMessageLabel.setText("Message after decryption is: " + Decryption.calculateDecryptedText(encryptedNums));
+    }
+
+    private void step3DecCopyHandler(ActionEvent event) {
+        if (encryptedMsg.equals("")) {
+            decryptedMessageLabel.setText("There is no encrypted message!");
+        } else {
+            step2EncryptedText.setText(encryptedMsg);
+        }
     }
 
     private JComponent createPanel() {
